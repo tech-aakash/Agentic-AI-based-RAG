@@ -1,69 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangChain Azure Agent</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LLM based Agentic AI Multi-tool Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
 </head>
 <body>
-    <div class="chat-wrapper">
-        <div class="chat-header">
-            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712108.png" alt="Bot" class="logo">
-            <h1>LangChain Azure Agent</h1>
-        </div>
-
-        <div id="chat-box" class="chat-box">
-            <div class="bot-msg bubble">
-                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712108.png" class="avatar">
-                <div class="msg-text">👋 Hi! I'm your AI assistant. Ask me anything!</div>
-            </div>
-        </div>
-
-        <form id="chat-form" class="chat-input">
-            <input type="text" id="question" name="question" placeholder="Type your queries here..." required>
-            <button type="submit">Send</button>
-        </form>
+  <div class="chat-container">
+    <div class="chat-header">
+      <img src="{{ url_for('static', filename='assets/bot.png') }}" class="header-icon" alt="Bot Logo">
+      <h1>LangChain Azure Agent</h1>
     </div>
 
-    <script>
-        const form = document.getElementById("chat-form");
-        const chatBox = document.getElementById("chat-box");
+    <div id="chat-box" class="chat-box">
+      <div class="message bot">
+        <img src="{{ url_for('static', filename='assets/bot.png') }}" class="avatar" alt="Bot">
+        <div class="bubble">👋 Hi! I'm your AI assistant. Ask me anything!</div>
+      </div>
+    </div>
 
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const question = document.getElementById("question").value.trim();
-            if (!question) return;
+    <form id="chat-form" class="chat-input">
+      <input type="text" id="question" name="question" placeholder="Type your queries here..." required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
 
-            // Display user message
-            chatBox.innerHTML += `
-                <div class="user-msg bubble">
-                    <div class="msg-text">${question}</div>
-                    <img src="https://cdn-icons-png.flaticon.com/512/1946/1946429.png" class="avatar">
-                </div>`;
-            document.getElementById("question").value = "";
-
-            // Scroll to bottom
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Send to backend
-            const response = await fetch("/ask", {
-                method: "POST",
-                body: new URLSearchParams({ question }),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" }
-            });
-
-            const data = await response.json();
-            const answer = data.response || `⚠️ ${data.error}`;
-
-            // Display bot message
-            chatBox.innerHTML += `
-                <div class="bot-msg bubble">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712108.png" class="avatar">
-                    <div class="msg-text">${answer}</div>
-                </div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
-    </script>
+  <!-- ✅ Link external JS -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
