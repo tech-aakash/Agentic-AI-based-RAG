@@ -3,30 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LLM based Agentic AI Multi-tool Chatbot</title>
+  <title>LangChain Azure Agent</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
 </head>
 <body>
   <div class="chat-container">
+    <!-- HEADER -->
     <div class="chat-header">
       <img src="{{ url_for('static', filename='assets/bot.png') }}" class="header-icon" alt="Bot Logo">
       <h1>LangChain Azure Agent</h1>
     </div>
 
+    <!-- CHAT BOX -->
     <div id="chat-box" class="chat-box">
       <div class="message bot">
         <img src="{{ url_for('static', filename='assets/bot.png') }}" class="avatar" alt="Bot">
-        <div class="bubble">👋 Hi! I'm your AI assistant. Ask me anything!</div>
+        <div class="bubble markdown">👋 Hi! I'm your AI assistant. Ask me anything!</div>
       </div>
     </div>
 
+    <!-- INPUT AREA -->
     <form id="chat-form" class="chat-input">
       <input type="text" id="question" name="question" placeholder="Type your queries here..." required />
       <button type="submit">Send</button>
     </form>
   </div>
 
-  <!-- ✅ Link external JS -->
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
