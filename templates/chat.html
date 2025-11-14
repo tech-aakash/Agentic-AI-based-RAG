@@ -1,36 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LangChain Azure Agent</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
 </head>
+
 <body>
-  <div class="chat-container">
+
     <!-- HEADER -->
-    <div class="chat-header">
-      <img src="{{ url_for('static', filename='assets/bot.png') }}" class="header-icon" alt="Bot Logo">
-      <h1>LangChain Azure Agent</h1>
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='assets/bot.png') }}" alt="Bot Logo" height="45">
+            </div>
+            <div class="title">AI Tutor Assistant</div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <div class="container">
+
+        <!-- LEFT: CHAT -->
+        <div class="chat-box" id="chat-box">
+            <div class="chat-container" id="chat-container"></div>
+
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Ask your question...">
+                <button id="send-button" class="send-button">➤</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: PDF VIEWER -->
+        <div class="pdf-box hidden" id="pdf-box">
+            <button class="close-pdf" id="closePdfBtn">X</button>
+            <iframe id="pdfViewer"></iframe>
+        </div>
+
     </div>
 
-    <!-- CHAT BOX -->
-    <div id="chat-box" class="chat-box">
-      <div class="message bot">
-        <img src="{{ url_for('static', filename='assets/bot.png') }}" class="avatar" alt="Bot">
-        <div class="bubble markdown">👋 Hi! I'm your AI assistant. Ask me anything!</div>
-      </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    <!-- INPUT AREA -->
-    <form id="chat-form" class="chat-input">
-      <input type="text" id="question" name="question" placeholder="Type your queries here..." required />
-      <button type="submit">Send</button>
-    </form>
-  </div>
-
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

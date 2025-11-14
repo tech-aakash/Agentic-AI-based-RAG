@@ -1,89 +1,127 @@
-// ✅ Load marked.js in your HTML (before this script runs):
-// <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+document.addEventListener('DOMContentLoaded', () => {
+    const chatContainer = document.getElementById("chat-container");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-button");
+    const pdfBox = document.getElementById("pdf-box");
+    const pdfViewer = document.getElementById("pdfViewer");
+    const closePdfBtn = document.getElementById("closePdfBtn");
 
-const form = document.getElementById("chat-form");
-const chatBox = document.getElementById("chat-box");
+    let activeTyping = null;
 
-// Optional: Basic sanitizer to avoid script injection (very light)
-function sanitizeHTML(html) {
-  const temp = document.createElement("div");
-  temp.textContent = html;
-  return temp.innerHTML;
-}
+    function appendMessage(text, sender, isTyping = false) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", sender === "user" ? "user-message" : "bot-message");
 
-// Function to render Markdown safely
-function renderMarkdown(markdownText) {
-  // Configure marked if needed
-  marked.setOptions({
-    breaks: true, // Line breaks
-    gfm: true, // GitHub-flavored markdown
-  });
+        const avatar = document.createElement("img");
+        avatar.classList.add("avatar");
+        avatar.src = sender === "user"
+            ? "/static/assets/user.png"
+            : "/static/assets/bot.png";
 
-  // Convert markdown → HTML
-  let html = marked.parse(markdownText || "");
+        const box = document.createElement("div");
+        box.classList.add("message-text");
 
-  // Optional: sanitize final HTML if you're concerned about security
-  // (use DOMPurify if you want stronger sanitization)
-  return html;
-}
+        if (isTyping) {
+            box.classList.add("typing-indicator");
+        } else {
+            box.innerHTML = marked.parse(text);
+            attachPdfLinks(box);
+        }
 
-// Handle chat form submission
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const questionInput = document.getElementById("question");
-  const question = questionInput.value.trim();
-  if (!question) return;
+        msg.appendChild(avatar);
+        msg.appendChild(box);
+        chatContainer.appendChild(msg);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
 
-  // 🧍 User message
-  chatBox.innerHTML += `
-    <div class="message user">
-      <div class="bubble">${sanitizeHTML(question)}</div>
-      <img src="/static/assets/user.png" class="avatar" alt="User">
-    </div>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
-  questionInput.value = "";
+        return box;
+    }
 
-  // 💭 Typing (thinking) animation
-  const typingDiv = document.createElement("div");
-  typingDiv.classList.add("message", "bot");
-  typingDiv.innerHTML = `
-    <img src="/static/assets/bot.png" class="avatar" alt="Bot">
-    <div class="bubble typing">thinking<span>.</span><span>.</span><span>.</span></div>
-  `;
-  chatBox.appendChild(typingDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
+    function attachPdfLinks(element) {
+        element.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault();
+                openPdf(link.href);
+            });
+        });
+    }
 
-  try {
-    const res = await fetch("/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ question }),
+    function openPdf(url) {
+        pdfViewer.src = url;
+        pdfBox.classList.remove("hidden");
+        pdfBox.classList.add("expanded");
+    }
+
+    closePdfBtn.addEventListener("click", () => {
+        pdfBox.classList.remove("expanded");
+        setTimeout(() => {
+            pdfBox.classList.add("hidden");
+            pdfViewer.src = "";
+        }, 300);
     });
-    const data = await res.json();
 
-    // Remove typing animation
-    typingDiv.remove();
+    function typewriter(el, text, speed = 20, done = () => {}) {
+        let i = 0;
+        let plain = document.createElement("div");
+        plain.innerHTML = marked.parse(text);
+        const finalHTML = plain.innerHTML;
+        const raw = plain.innerText;
 
-    // Render markdown in bot response
-    const formattedResponse = renderMarkdown(data.response || "⚠️ Something went wrong.");
+        function step() {
+            if (i < raw.length) {
+                el.innerText = raw.substring(0, i + 1);
+                i++;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                activeTyping = setTimeout(step, speed);
+            } else {
+                el.innerHTML = finalHTML;
+                attachPdfLinks(el);
+                activeTyping = null;
+                done();
+            }
+        }
+        step();
 
-    // 🧠 Bot response
-    const botMessage = document.createElement("div");
-    botMessage.classList.add("message", "bot");
-    botMessage.innerHTML = `
-      <img src="/static/assets/bot.png" class="avatar" alt="Bot">
-      <div class="bubble markdown">${formattedResponse}</div>
-    `;
-    chatBox.appendChild(botMessage);
+        return {
+            stop() {
+                clearTimeout(activeTyping);
+                activeTyping = null;
+            }
+        };
+    }
 
-  } catch (error) {
-    typingDiv.remove();
-    chatBox.innerHTML += `
-      <div class="message bot">
-        <img src="/static/assets/bot.png" class="avatar" alt="Bot">
-        <div class="bubble">⚠️ Network error. Please try again.</div>
-      </div>`;
-  }
+    function sendMessage() {
+        const msg = userInput.value.trim();
+        if (!msg) return;
 
-  chatBox.scrollTop = chatBox.scrollHeight;
+        appendMessage(msg, "user");
+        userInput.value = "";
+
+        // ⬅️ Thinking indicator remains!
+        const typingBox = appendMessage("", "bot", true);
+
+        fetch("/ask", {
+            method: "POST",
+            body: new URLSearchParams({ question: msg }),
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Remove the thinking bubble
+            chatContainer.removeChild(typingBox.parentElement);
+
+            // Add bot’s actual message instantly (no typing animation)
+            const botBox = appendMessage("", "bot");
+            botBox.innerHTML = marked.parse(data.response);
+
+            attachPdfLinks(botBox);
+        })
+        .catch(err => {
+            appendMessage("Error: " + err.message, "bot");
+        });
+    }
+
+    sendButton.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") sendMessage();
+    });
 });
