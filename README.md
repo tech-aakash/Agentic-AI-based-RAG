@@ -81,7 +81,7 @@ All persisted in **chat_log.json**.
 
 ### 1. Clone the repository
 ```bash
-git clone [<repository-url>](https://github.com/tech-aakash/Agentic-AI-based-RAG.git)
+git clone (https://github.com/tech-aakash/Agentic-AI-based-RAG.git)
 cd <project-folder>
 ```
 
