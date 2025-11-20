@@ -2,6 +2,9 @@
 *A LLM powered application with deep/brief answers, citations, grading, and quizzes.*
 
 ---
+## 🧩 System Architecture
+
+![AI Tutor Architecture](architecture.png)
 
 ## Overview
 
