@@ -182,3 +182,5 @@ cython_debug/
 
 #anything has log in name
 *log*
+
+chat_log.json
