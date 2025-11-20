@@ -2,7 +2,7 @@
 *A LLM powered application with deep/brief answers, citations, grading, and quizzes.*
 
 ---
-## 🧩 System Architecture
+## System Architecture
 
 ![AI Tutor Architecture](architecture.png)
 
@@ -81,7 +81,7 @@ All persisted in **chat_log.json**.
 
 ### 1. Clone the repository
 ```bash
-git clone <your-repository-url>
+git clone [<repository-url>](https://github.com/tech-aakash/Agentic-AI-based-RAG.git)
 cd <project-folder>
 ```
 
